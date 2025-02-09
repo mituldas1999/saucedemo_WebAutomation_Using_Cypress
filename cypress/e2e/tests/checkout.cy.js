@@ -4,12 +4,26 @@ import CartPage from '../pages/CartPage';
 import CheckoutPage from '../pages/CheckoutPage';
 
 describe('Checkout Process', () => {
+  let credentials;
+
   beforeEach(() => {
-    LoginPage.visit();
-    LoginPage.login('standard_user', 'secret_sauce');
+    // Load the credentials from the fixture
+    cy.fixture('credentials').then((data) => {
+      credentials = data;
+    });
   });
 
   it('completes a purchase', () => {
+    // Ensure credentials are loaded properly
+    cy.wrap(credentials).should('have.property', 'validUser');
+
+    const { username, password } = credentials.validUser;
+
+    // Use dynamic credentials for login
+    LoginPage.visit();
+    LoginPage.login(username, password);
+
+    // Perform the checkout process
     InventoryPage.addFirstProductToCart();
     InventoryPage.goToCart();
     CartPage.proceedToCheckout();
